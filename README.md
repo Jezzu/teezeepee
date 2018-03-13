@@ -14,7 +14,7 @@ A TCP based chat room.
 
 ### Technical Details
 - **Python:**  v3.6+ [via](https://www.python.org/)
-- **ZeroMQ:** a a brokerless messaging library [via](https://zeromq.org/)
+- **ZeroMQ:** a brokerless messaging library [via](https://zeromq.org/)
 
 ### Contact
 - [goldy@gmlunesa.com](mailto:goldy@gmlunesa.com)
