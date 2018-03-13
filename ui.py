@@ -41,4 +41,5 @@ class UI(object):
 
     def run(self):
         thread = threading.Thread(target=self.display_constant_loop)
+        thread.daemon = True
         thread.start()
