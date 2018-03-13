@@ -1,5 +1,8 @@
 import zmq
 
+import argparse
+import configparser
+
 class Server(object):
 	def __init__(self, chat_interface, chat_port, show_interface, show_port):
 		self.context = zmq.Context()
@@ -24,7 +27,7 @@ class Server(object):
 
 		self.show_socket = self.context.socket(zmq.PUB)
 		show_bind_string = 'tcp://{}:{}'.format(self.show_interface, self.show_port)
-		self.show_socket.bind(display_bind_string)
+		self.show_socket.bind(show_bind_string)
 
 
 	# Return list based on received zmq message
@@ -35,7 +38,7 @@ class Server(object):
 
 		return [username, message]
 
-
+	# Refresh screen
 	def refresh(self, username, message):
 		data = {
 			'username' : username,
@@ -46,11 +49,37 @@ class Server(object):
 		self.show_socket.send_json(data)
 
 	# Constant loop to receive messages
-	def constant_loop(self):
+	def forever_loop(self):
 		self.bind_tcp_ports()
 
 		while True:
 			username, message = self.get_message()
 			self.refresh(username, message)
+
+# Function to parse argument in the command line
+def parse_args():
+    parser = argparse.ArgumentParser(description='Server for teezeepee')
+
+    parser.add_argument('--config-file',
+                        type=str,
+                        help='Default path for configuration file.')
+
+    return parser.parse_args()
+
+
+if '__main__' == __name__:
+    try:
+        args = parse_args()
+        config_file = args.config_file if args.config_file is not None else 'tzp.cfg'
+
+        config = configparser.ConfigParser()
+        config.read(config_file)
+        config = config['default']
+
+        server = Server('*', config['chat_port'], '*', config['display_port'])
+        server.forever_loop()
+
+    except KeyboardInterrupt:
+        pass
 
 
