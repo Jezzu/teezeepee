@@ -1,5 +1,8 @@
 import zmq
 
+import argparse
+import configparser
+
 import sys
 import threading
 
@@ -69,3 +72,32 @@ class Client(object):
     def run(self):
         thread = threading.Thread(target=self.client_constant_loop)
         thread.start()
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Client for teezeepee')
+
+    # Please specify your username
+    parser.add_argument('username',
+                        type=str,
+                        help='Specified username')
+
+    parser.add_argument('--config-file',
+                        type=str,
+                        help='Default path for configuration file.')
+
+    return parser.parse_args()
+
+if '__main__' == __name__:
+    try:
+        args = parse_args()
+        config_file = args.config_file if args.config_file is not None else '/server/tzp.cfg'
+        config = configparser.ConfigParser()
+        config.read(config_file)
+        config = config['default']
+
+        client = Client(args.username,
+                            config['server_host'], config['chat_port'])
+        client.client_constant_loop()
+
+    except KeyboardInterrupt:
+        pass
